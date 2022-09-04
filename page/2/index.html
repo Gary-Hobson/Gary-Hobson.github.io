@@ -18,7 +18,7 @@
   
     <meta property="og:type" content="website">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:url" content="http://example.com/page/2/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="非典型技术宅">
@@ -223,15 +223,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2022/09/04/C%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8%E8%A7%84%E7%BA%A6%E4%B9%8B%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%82%E9%A1%BA%E5%BA%8F/" target="_self">
-          C语言调用规约之函数入参顺序
+        <a href="/2022/09/04/%E4%BA%8C%E5%80%BC%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%92%8C%E4%BA%92%E6%96%A5%E9%94%81%E6%9C%89%E4%BD%95%E5%BC%82%E5%90%8C/" target="_self">
+          二值信号量和互斥锁有何异同
         </a>
       </h1>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/C%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8%E8%A7%84%E7%BA%A6%E4%B9%8B%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%82%E9%A1%BA%E5%BA%8F/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E4%BA%8C%E5%80%BC%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%92%8C%E4%BA%92%E6%96%A5%E9%94%81%E6%9C%89%E4%BD%95%E5%BC%82%E5%90%8C/" target="_self">
         <div>
-          结论 在 IA-32 平台上有三种入参方式，stdcall、cdecl、fastcall，前两种参数入参顺序均为从右至左压栈，fastcall 前两个参数使用寄存器，后面参数从右至左压栈。C&#x2F;C++ 默认使用 cdecl 方式，MSVC 编译器默认使用 stdcall 。  x64 平台只有一种入参方式，即 fastcall 方式，前四个参数使用寄存器保存，后面参数后从右至左压栈。  A
+          二值信号量和互斥锁有何异同（优先级反转的处理）絮絮叨叨：之前一直以为互斥锁就是用二值信号量来实现的，但是发现两个还是有本质区别。 信号量和互斥锁信号量：信号量本质是一种同步机制，用于线程间同步（时间先后顺序）。 信号量典型用例是一个生产者消费者模型，生产者线程进行V操作(释放信号量,信号量++)，消费者线程进行P操作(持有信号量，信号量–)，信号量为0时，消费无法持有信号量，进入挂起等待状态。 互
         </div>
       </a>
 
@@ -256,279 +256,213 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2022/09/04/MCU%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/" target="_self">
-          MCU自动下载原理及实现
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/MCU%E8%87%AA%E5%8A%A8%E4%B8%8B%E8%BD%BD%E5%8E%9F%E7%90%86%E5%8F%8A%E5%AE%9E%E7%8E%B0/" target="_self">
-        <div>
-          串口自动下载电路实质为：上位机通过控制 USB 转串口芯片 DTR、RTS 引脚电平，配合硬件电路使进入芯片下载模式 自动下载原理串口下载的需要依赖 bootload，其流程为在芯片中先下载一个 bootload , 进入 bootload 后检查是否进入下载模式，如果未进入下载程序，则跳转到实际程序运行。 根据进入 bootload 的方式可分为两种，一种为进入 bootload 由外部引脚控制
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/Protobuf%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E5%86%99/" target="_self">
-          Protobuf文件的编写
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/Protobuf%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E5%86%99/" target="_self">
-        <div>
-          介绍：数据从 SLPI 侧上报到 HAL 层，都需要从底层使用pb接口，将规定的数据格式 publish 上来，在HAL层再通过调用同样的数据格式的接口解析出数据。 数据格式的定义——Protobuf文件的编写 什么是Protobuf？Protobuf (Protocol Buffers) 是谷歌开发的一款无关平台，无关语言，可扩展，轻量级高效的序列化结构的数据格式，用于将自定义数据结构序列化成字
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/STM32%E4%B8%8A%E4%BD%BF%E7%94%A8POSIX%E6%8E%A5%E5%8F%A3/" target="_self">
-          STM32上使用POSIX接口
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/STM32%E4%B8%8A%E4%BD%BF%E7%94%A8POSIX%E6%8E%A5%E5%8F%A3/" target="_self">
-        <div>
-          STM32上使用POSIX接口絮絮叨叨：如果不是博客粉丝，我都快要遗忘公众号这回事了，感谢所有认真阅读的读者的支持！ FreeRTOS 和 POSIX 接口简介POSIX 接口的全称是：可移植性操作系统接口(Portable Operating System Interface, POSIX)。它是由电器和电子工程师协会(IEEE)开发的开放操作系统接口标准，并且得到 IOS 和 ANSI 的认可
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/X86%E5%AF%84%E5%AD%98%E5%99%A8%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F/" target="_self">
-          X86 寄存器及寻址方式
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/X86%E5%AF%84%E5%AD%98%E5%99%A8%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F/" target="_self">
-        <div>
-          X86 寄存器及寻址方式絮絮叨叨：之前看的汇编都是 ARM Cotex M 系列，在调试任务切换时，不得不学习一下 x86 的汇编。 x86 寄存器列表inter i386 平台下寄存器包括 8 个 32 位的通用寄存器、8 个调试寄存器、6 个 16 位的段寄存器、4 个 32 位的控制寄存器等寄存器。 使用最多的时 8 个通用寄存器，EAX、ECX、EDX、EBX、ESI、EDI、ESP、EB
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/gcov%E6%9F%A5%E7%9C%8B%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87/" target="_self">
-          gcov查看代码覆盖率
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/gcov%E6%9F%A5%E7%9C%8B%E4%BB%A3%E7%A0%81%E8%A6%86%E7%9B%96%E7%8E%87/" target="_self">
-        <div>
-          絮絮叨叨：想写的素材有很多，每次都是拖到最后也没写完，还是要多学习彭同学的 “先找软柿子捏” 。 GCOV 工具简介gcov是一个测试代码覆盖率的工具。 它是 gcc 自带的查看代码覆盖率的工具，无需额外安装，在嵌入式的 arm-eabi-none-gcc 中同样可以使用（需要重写部分系统函数）。 使用效果如下图所示：  程序运行完成后，可以查看每个文件的代码覆盖率情况，上面报告中展示了每个文件的
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/mktemp%20%E4%BD%BF%E7%94%A8%E9%9C%80%E8%B0%A8%E6%85%8E%EF%BC%8C%E8%AE%A4%E7%9C%9F%E5%AF%B9%E5%BE%85%E7%BC%96%E8%AF%91%E5%99%A8%E8%AD%A6%E5%91%8A/" target="_self">
-          mktemp 使用需谨慎，认真对待编译器警告
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/mktemp%20%E4%BD%BF%E7%94%A8%E9%9C%80%E8%B0%A8%E6%85%8E%EF%BC%8C%E8%AE%A4%E7%9C%9F%E5%AF%B9%E5%BE%85%E7%BC%96%E8%AF%91%E5%99%A8%E8%AD%A6%E5%91%8A/" target="_self">
-        <div>
-          mktemp 使用需谨慎，认真对待编译器警告絮絮叨叨：今天在做一个文件缓存管理的时候，使用 mktemp 生成一个临时文件名，在编译时编译器提示我，该函数不安全，头铁的我还是使用了。  然后我就变成这样了  代码复现mktemp 的作用是根据传入的字符串模板，生成一个临时文件名。 12345char path[PATH_MAX] &#x3D; &quot;test_XXXXXX&quot;;temp_tat
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/stm32L0%E4%BD%BF%E7%94%A8arduino/" target="_self">
-          stm32L0使用arduino
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/stm32L0%E4%BD%BF%E7%94%A8arduino/" target="_self">
-        <div>
-          絮絮叨叨：在做一个无线姿态传感器的小项目时，看中了 arduino 强大的第三方库，于是选型使用了 arduino 进行开发。可是在第一步时就踩坑了。。。。 问题简述我硬件使用 STM32L051K8U6 + NRF24L01 + MPU6050，准备用来做一个无线的姿态传感器。  在使用 arduino 对 stm32 时，烧录的 Demo 程序没有任何反应，而使用之前 keil 编译的程序则可
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/stm32%E4%BD%BF%E7%94%A8%E7%B3%BB%E7%BB%9FIO/" target="_self">
-          stm32使用系统IO
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/stm32%E4%BD%BF%E7%94%A8%E7%B3%BB%E7%BB%9FIO/" target="_self">
-        <div>
-          系统 IO 和标准 IO系统 IO 一般指的是 Linux&#x2F;Unix 系统调用中关于 I&#x2F;O 操作的统称，其中包括 open、read、write、close 等操作。与系统 IO 对应还有标准 IO，标准 IO 是 ISO 标准中 C 语言标准定义的 IO 访问接口，例如 fprintf&#x2F;fgets 等 C 语言标准中定义的文件访问接口。 在 Linux 系统中 o
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2022-09-04 19:19" pubdate>
-              2022-09-04
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2022/09/04/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BB%BA%E8%AE%AE%E5%B0%91%E7%94%A8if%E8%AF%AD%E5%8F%A5%EF%BC%8C%E4%B8%8D%E6%98%AF%E8%BF%90%E8%A1%8C%E6%95%88%E7%8E%87/" target="_self">
+        <a href="/2022/09/04/%E4%BB%8E%E6%B1%87%E7%BC%96%E8%A7%92%E5%BA%A6%E6%AF%94%E8%BE%83%20if%20%E5%92%8Cswitch%20%E6%80%A7%E8%83%BD%E5%B7%AE%E5%BC%82/" target="_self">
           为什么建议少用if语句，不是运行效率
         </a>
       </h1>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BB%BA%E8%AE%AE%E5%B0%91%E7%94%A8if%E8%AF%AD%E5%8F%A5%EF%BC%8C%E4%B8%8D%E6%98%AF%E8%BF%90%E8%A1%8C%E6%95%88%E7%8E%87/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E4%BB%8E%E6%B1%87%E7%BC%96%E8%A7%92%E5%BA%A6%E6%AF%94%E8%BE%83%20if%20%E5%92%8Cswitch%20%E6%80%A7%E8%83%BD%E5%B7%AE%E5%BC%82/" target="_self">
         <div>
-          为什么建议少用if语句，不是影响运行效率！絮絮叨叨：放假使我的作息混乱…  相信大家或多或少的听说过，少用点if-else吧？但是为什么要少用呢，有人说他会影响程序运行效率，但是这并不是他最大的罪状！ if-else 的罪状if-else 作为三种最基本的程序结构之一，是我们从最开始学习编程时就接触的基本语句。但是到后面的阶段就不断听人说少用if-else。 如果询问原因的话，你得到的结果大概率时
+          从汇编角度比较 if 和switch 性能差异絮絮叨叨 : 这个五一就好好的当个技术宅吧，把之前欠的作业给补上，后面争取稳定周更一篇 if 和 switch 性能差异在写代码的时候肯定会用到不少if和switch语句，除了我们都知道的用法上的差异，性能上有什么差异。 这篇文章尝试从汇编的角度去解决下面的几个问题。  影响if和switch性能的差异点在哪，他们有何异同。 if和switch的差异临
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%92%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E6%9C%89%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB/" target="_self">
+          依赖注入和工厂模式有什么关系
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%92%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E6%9C%89%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB/" target="_self">
+        <div>
+          依赖注入和工厂模式有什么关系？（C语言示例）絮絮叨叨：今天师傅让我给他讲讲什么是工厂模式，工厂模式又要怎么用。 虽然说知道什么是工厂模式，但是在还没在实际的代码中用过。于是乎又深入的学习了下，发现工厂模式其实我们都见过，只是并没意识到而已。  什么是工厂模式 这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。在工厂模式中，我们在创建对象时不会对客户端暴露创建逻辑，并且是通过使用一个
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E5%8F%98%E9%95%BF%E6%95%B0%E7%BB%84%E5%92%8C%E6%9F%94%E6%80%A7%E6%95%B0%E7%BB%84/" target="_self">
+          变长数组和柔性数组
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E5%8F%98%E9%95%BF%E6%95%B0%E7%BB%84%E5%92%8C%E6%9F%94%E6%80%A7%E6%95%B0%E7%BB%84/" target="_self">
+        <div>
+          变长数组和柔性数组絮絮叨叨： 让人不开心的事，不去做就好 数组的变种我们常规使用的数组大部分都是C89标准的功能，在C99标准中添加了对变长数组和零长度数组的支持。 这两种新的特性有时会给开发带来不错的效果。 变长数组变长数组（variable-length array）并不是长度可以变化的数组。 在最开始学习C语言时，基本都强调过数组的长度是不可变的，同样这句话依然适用。 这里指的变长，是在定义
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E5%96%9C%E5%A4%A7%E5%A5%94%E6%99%AE%EF%BC%8Cwsl%E5%8E%9F%E7%94%9F%E6%94%AF%E6%8C%81GUI%E4%BA%86/" target="_self">
+          喜大奔普，wsl原生支持GUI了
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E5%96%9C%E5%A4%A7%E5%A5%94%E6%99%AE%EF%BC%8Cwsl%E5%8E%9F%E7%94%9F%E6%94%AF%E6%8C%81GUI%E4%BA%86/" target="_self">
+        <div>
+          前两天偶然发现，WSL2 竟然原生支持 GUI 了，这个可能是 Win11 给我带来的唯一惊喜吧~ 使用方式用一个来形容使用体验就是爽! 现在可以完全抛弃双系统，什么 X11 的也统统消失吧~ 首先看下基本使用方式：  在 WSL2 的命令行输入命令后，会直接出现一个窗口显示对应的 GUI    在 Windows11 的开始菜单中点击图标启动（可以直接在搜索栏中搜索程序）   当你在 WSL2
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0%E4%B8%8D%E5%AE%89%E5%85%A8--%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%85%8E%E7%94%A8list.h/" target="_self">
+          安全函数不安全--多线程慎用list.h
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E5%AE%89%E5%85%A8%E5%87%BD%E6%95%B0%E4%B8%8D%E5%AE%89%E5%85%A8--%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%85%8E%E7%94%A8list.h/" target="_self">
+        <div>
+          安全函数不安全–多线程慎用list.h絮絮叨叨： 一个 BUG 轻轻松松让我少了几个小时的睡眠时间！ 前言linux 开发应该多少都听过大名鼎鼎的 list.h ，其简洁优雅的设计，一个头文件完成了一个高可用的链表。 但是 list.h 并不是线程安全的，在多线程的情况下使用，必须考虑多线程数据同步的问题。 然而。。。。 我在使用互斥锁对链表的操作进行保护之后，还是被坑了！ 下面是把我坑了的 li
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E5%B0%8F%E7%B1%B3%E6%B8%A9%E6%B9%BF%E5%BA%A6%E8%AE%A1%E6%8B%86%E8%A7%A3/" target="_self">
+          小米温湿度计拆解
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E5%B0%8F%E7%B1%B3%E6%B8%A9%E6%B9%BF%E5%BA%A6%E8%AE%A1%E6%8B%86%E8%A7%A3/" target="_self">
+        <div>
+          絮絮叨叨：心情不好，码字转移注意力… 小米温湿度计拆解前段时间去朋友家，看到它桌子上的时钟，被吸引了注意力，极其简洁的外观和清晰的显示。  这就是米家电子温湿度计 Pro 。 看到这个符号的显示我惊了，电子墨水屏有这么好的清晰度吗，于是乎也买了一个。想着用来改装做一个自己的显示屏。  拆开外壳，一个非常简单的 PCB 板，正面一共 20 个阻容元件、4 个二极管、3 个晶振、4颗芯片以及三粒电池，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-09-04 19:19" pubdate>
+              2022-09-04
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/09/04/%E8%BF%90%E8%A1%8C%E5%9C%A8MCU%E4%B8%8A%E7%9A%84Linux-Nuttx%20%E7%AE%80%E4%BB%8B/" target="_self">
+          运行在MCU上的Linux-Nuttx 简介
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/09/04/%E8%BF%90%E8%A1%8C%E5%9C%A8MCU%E4%B8%8A%E7%9A%84Linux-Nuttx%20%E7%AE%80%E4%BB%8B/" target="_self">
+        <div>
+          之前在论坛看到过一篇帖子，说怎么在 STM32 上移植 Linux ，帖子写了很长，最后才发现使用的 uclinux，而且还是只启动一个 uboot。 现在想想为什么需要在 STM32 这种 MCU 上移植 Linux 呢，个人猜测可能是因为 Linux 环境丰富的组件和软件可移植性吧。 可是如果有一个 mini 版的 Linux 系统可以用呢，而且还不需要移植上手即用，这个就是  Nuttx。
         </div>
       </a>
 
@@ -551,7 +485,7 @@
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
     </span>
   </nav>
 
