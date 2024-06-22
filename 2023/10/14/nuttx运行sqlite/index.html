@@ -1,0 +1,879 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="非典型技术宅">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="絮絮叨叨： 上一次写 NuttX 的文章还是在 2021 年，那时我接触 NuttX 的只有几个月，当时只写了一个很简单的如何编译一个 “hello world” 的代码。 现在参与 NuttX 开发已经快有三年的时间了，这段时间里对 NuttX 的了解程度已有很大不同，自己基于 NuttX 也做了一些项目，于是乎这个系列好像可以再更新一下了。 NuttX 简介NuttX 是一个具有丰富功能的、能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nuttx 运行 sqlite">
+<meta property="og:url" content="https://gary-hobson.github.io/2023/10/14/nuttx%E8%BF%90%E8%A1%8Csqlite/index.html">
+<meta property="og:site_name" content="阿宅的小站">
+<meta property="og:description" content="絮絮叨叨： 上一次写 NuttX 的文章还是在 2021 年，那时我接触 NuttX 的只有几个月，当时只写了一个很简单的如何编译一个 “hello world” 的代码。 现在参与 NuttX 开发已经快有三年的时间了，这段时间里对 NuttX 的了解程度已有很大不同，自己基于 NuttX 也做了一些项目，于是乎这个系列好像可以再更新一下了。 NuttX 简介NuttX 是一个具有丰富功能的、能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://files.mdnice.com/user/11205/0eefd057-189c-4878-be7a-b583b9c7ce7b.png">
+<meta property="article:published_time" content="2023-10-14T19:19:27.000Z">
+<meta property="article:modified_time" content="2024-06-22T16:54:54.153Z">
+<meta property="article:author" content="非典型技术宅">
+<meta property="article:tag" content="nuttx">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://files.mdnice.com/user/11205/0eefd057-189c-4878-be7a-b583b9c7ce7b.png">
+  
+  
+  
+  <title>nuttx 运行 sqlite - 阿宅的小站</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"gary-hobson.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":30,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>阿宅的小站</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nuttx 运行 sqlite"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        非典型技术宅
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-14 19:19" pubdate>
+          星期六, 十月 14日 2023
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">nuttx 运行 sqlite</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><strong>絮絮叨叨：</strong></p>
+<p>上一次写 NuttX 的文章还是在 2021 年，那时我接触 NuttX 的只有几个月，当时只写了一个很简单的如何编译一个 “hello world” 的代码。</p>
+<p>现在参与 NuttX 开发已经快有三年的时间了，这段时间里对 NuttX 的了解程度已有很大不同，自己基于 NuttX 也做了一些项目，于是乎这个系列好像可以再更新一下了。</p>
+<h1 id="NuttX-简介"><a href="#NuttX-简介" class="headerlink" title="NuttX 简介"></a>NuttX 简介</h1><p>NuttX 是一个具有丰富功能的、能够运行在小型微控制器上的实时操作系统（RTOS）。它有完整的多线程&#x2F;多进程、文件系统和TCP&#x2F;IP 协议栈的支持，并且实现了所有常用 POSIX API， 能够极大程度的和 Linux 环境开发保持一致。</p>
+<p>下面这篇文章将会体现这种接口兼容性的优点，我们将会在 NuttX 上移植一个完成 SQLite 数据库，并且在 ESP32 上运行和 Linux 一样的 SQLite3 命令行工具。</p>
+<h1 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h1><p>开发环境优先推荐使用 Ubuntu 20.04 及以上系统进行开发，其次可以使用 wsl2 进行开发。</p>
+<h2 id="下载代码"><a href="#下载代码" class="headerlink" title="下载代码"></a><strong>下载代码</strong></h2><p>这个仓库使用 NuttX release-12.0 代码，并将常用仓库以 git submodules 方式集成，避免每次重新编译需要下载。</p>
+<div class="code-wrapper"><pre><code class="hljs crmsh">git <span class="hljs-keyword">clone</span> <span class="hljs-title">--recursive</span> git@github.com:Gary-Hobson/NXOS.git</code></pre></div>
+
+<p>下载代码后需要安装一些基础的依赖库才能进行编译。</p>
+<h2 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a><strong>安装依赖</strong></h2><div class="code-wrapper"><pre><code class="hljs mipsasm">sudo apt update
+sudo apt <span class="hljs-keyword">install </span>-y \
+curl <span class="hljs-keyword">bison </span>flex gettext texinfo libncurses5-dev libncursesw5-dev xxd \
+gperf automake libtool pkg-<span class="hljs-built_in">config</span> <span class="hljs-keyword">build-essential </span>genromfs libx11-dev\
+libgmp-dev libmpc-dev libmpfr-dev libisl-dev <span class="hljs-keyword">binutils-dev </span>libelf-dev \
+libexpat-dev gcc-<span class="hljs-keyword">multilib </span>g++-<span class="hljs-keyword">multilib </span>picocom u-<span class="hljs-keyword">boot-tools </span>util-Linux \
+kconfig-frontends gcc-arm-none-eabi <span class="hljs-keyword">binutils-arm-none-eabi </span>zlib1g-dev
+pip <span class="hljs-keyword">install </span>pyelftools cxxfilt</code></pre></div>
+
+<h2 id="编译代码"><a href="#编译代码" class="headerlink" title="编译代码"></a><strong>编译代码</strong></h2><p>NuttX 有个很强大的功能就是它有一个完成的模拟器支持，如果代码和硬件无关，在模拟器运行成功后，无需任何修改可以运行在硬件上。</p>
+<p>我们首先在 simulator 上编译一个简单的 demo：</p>
+<div class="code-wrapper"><pre><code class="hljs awk">.<span class="hljs-regexp">/nx.sh boards/</span>sim<span class="hljs-regexp">/configs/</span>hello V=<span class="hljs-number">1</span></code></pre></div>
+
+<p>这个将会编译 <code>boards/sim/configs/hello </code> 这个 sim 的配置。 这个配置开启了 sim 环境中包括网络在内的常用功能，大部分与硬件无关的代码可以使用这个配置进行编译运行。</p>
+<h2 id="运行代码"><a href="#运行代码" class="headerlink" title="运行代码"></a><strong>运行代码</strong></h2><p>在编译完成后，在 NuttX 目录下会出现一个 NuttX 的可执行文件，</p>
+<div class="code-wrapper"><pre><code class="hljs awk">.<span class="hljs-regexp">/nuttx/</span>nuttx</code></pre></div>
+<p>NSH 使用 在 NuttX 启动后会出现一个 Shell，它支持基本的命令，nsh 中输入 help 查看支持的所有命令。</p>
+<blockquote>
+<p><strong>help:</strong> 查看支持的所有命令行命令，其中 Builtin Apps 为可执行的 task，例如 hello 为一个独立的 task 可以运行，可以理解为一个进程。<br><strong>ps:</strong> nsh 内置命令，查看正在运行的线程信息<br><strong>ls:</strong> nsh 内置命令，查看文件系统中的文件<br><strong>demo:</strong> 启动 demo 进程，运行后会执行 projects&#x2F;demo&#x2F;main.c 的代码<br><strong>poweroff:</strong> 退出系统</p>
+</blockquote>
+<p>运行后结果：</p>
+<div class="code-wrapper"><pre><code class="hljs bash">NuttShell (NSH)
+nsh&gt;
+nsh&gt; <span class="hljs-built_in">help</span>
+<span class="hljs-built_in">help</span> usage:  <span class="hljs-built_in">help</span> [-v] []
+    .          <span class="hljs-built_in">break</span>      dmesg      hexdump    <span class="hljs-built_in">mkfifo</span>     <span class="hljs-built_in">readlink</span>   <span class="hljs-literal">true</span>
+    [          <span class="hljs-built_in">cat</span>        <span class="hljs-built_in">echo</span>       insmod     mkrd       <span class="hljs-built_in">rm</span>         <span class="hljs-built_in">truncate</span>
+    ?          <span class="hljs-built_in">cd</span>         <span class="hljs-built_in">env</span>        <span class="hljs-built_in">kill</span>       mount      <span class="hljs-built_in">rmdir</span>      <span class="hljs-built_in">uname</span>
+    <span class="hljs-built_in">alias</span>      <span class="hljs-built_in">cp</span>         <span class="hljs-built_in">exec</span>       losetup    <span class="hljs-built_in">mv</span>         rmmod      umount
+    <span class="hljs-built_in">unalias</span>    cmp        <span class="hljs-built_in">exit</span>       <span class="hljs-built_in">ln</span>         nslookup   <span class="hljs-built_in">set</span>        <span class="hljs-built_in">unset</span>
+    arp        <span class="hljs-built_in">dirname</span>    <span class="hljs-literal">false</span>      <span class="hljs-built_in">ls</span>         poweroff   <span class="hljs-built_in">sleep</span>      <span class="hljs-built_in">uptime</span>
+    base64dec  <span class="hljs-built_in">date</span>       free       lsmod      <span class="hljs-built_in">printf</span>     <span class="hljs-built_in">source</span>     usleep
+    base64enc  <span class="hljs-built_in">dd</span>         memdump    md5        ps         <span class="hljs-built_in">test</span>       wget
+    <span class="hljs-built_in">basename</span>   <span class="hljs-built_in">df</span>         <span class="hljs-built_in">help</span>       <span class="hljs-built_in">mkdir</span>      <span class="hljs-built_in">pwd</span>        time       xd
+Builtin Apps:
+    demo        hello       ping        sh
+    dumpstack   nsh         setlogmask  telnetd
+nsh&gt;
+nsh&gt; ping www.baidu.com
+PING 110.242.68.4 56 bytes of data
+56 bytes from 110.242.68.4: icmp_seq=0 time=19.9 ms
+56 bytes from 110.242.68.4: icmp_seq=1 time=11.3 ms
+56 bytes from 110.242.68.4: icmp_seq=2 time=22.7 ms
+3 packets transmitted, 3 received, 0% packet loss, time 2322 ms
+rtt min/avg/max/mdev = 11.300/17.966/22.700/4.853 ms
+nsh&gt;
+nsh&gt; <span class="hljs-built_in">ls</span>
+/:
+ bin/
+ data/
+ dev/
+ etc/
+ proc/
+ tmp/
+nsh&gt;
+nsh&gt; demo
+Hello, World!!
+nsh&gt;
+nsh&gt; poweroff</code></pre></div>
+
+<p>在上面的运行示例中执行一个 demo 的进程（伪进程，没有独立地址空间），并打印了一个 hello world。</p>
+<h2 id="工程结构"><a href="#工程结构" class="headerlink" title="工程结构"></a>工程结构</h2><p>这个代码位置在 projects&#x2F;demo&#x2F;main.c 里面，可以修改里面代码执行不同的任务。<br>其工程目录结构如下:</p>
+<div class="code-wrapper"><pre><code class="hljs stylus">projects/demo
+├── Kconfig
+├── <span class="hljs-selector-tag">main</span><span class="hljs-selector-class">.c</span>
+├── Make<span class="hljs-selector-class">.defs</span>
+└── Makefile</code></pre></div>
+
+<p>Make.def 和 Makefile 为编译系统相关文件， <code>PROGNAME</code>  为进程名显示中 nsh 中的名字，<code>PRIORITY</code><br>为任务优先级(0为最低优先级，255为最高优先级，默认为100)， <code>STACKSIZE</code> 为进程栈大小，通过 Kconfig 的配置项决定。</p>
+<div class="code-wrapper"><pre><code class="hljs cpp">cat project/demo/main.c
+...
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> *argv[])</span></span>
+<span class="hljs-function"></span>&#123;
+  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Hello, World!!\n&quot;</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;
+
+# Demo porject
+...
+PROGNAME  = demo
+PRIORITY  = <span class="hljs-number">100</span>
+STACKSIZE = CONFIG_PROJECT_DEMO_STACKSIZE
+MAINSRC = main.c</code></pre></div>
+
+<h1 id="移植-SQLite3"><a href="#移植-SQLite3" class="headerlink" title="移植 SQLite3"></a>移植 SQLite3</h1><p>SQLite 是一个轻量级的关系型数据库，它将数据以单个文件的方式存在与文件系统中。<br>我们这次将示例如何将 SQLite 移植到 NuttX 中运行。</p>
+<p>SQLite 对跨平台做了良好的支持，官方提供了一个移植指南 <a target="_blank" rel="noopener" href="https://www.sqlite.org/custombuild.html">https://www.SQLite.org/custombuild.html</a> ，移植 SQLite 只需要实现内存、文件系统和锁相关的支持即可。</p>
+<p>但使用 NuttX 这些工作都可以不需要了，因为它的接口和 Linux 完全一致，不需要做任何修改即可使用。</p>
+<h2 id="下载-SQLite-源码"><a href="#下载-SQLite-源码" class="headerlink" title="下载 SQLite 源码"></a>下载 SQLite 源码</h2><p>SQLite 默认代码有 100多个文件，我们使用 SQLite 官方提供的合并后的文件<a target="_blank" rel="noopener" href="https://www.sqlite.org/getthecode.html">https://www.SQLite.org/getthecode.html</a> ，它只有四个文件，将所有代码都合并到一起了(合并之后一个文件20多万行，编译死慢死慢…)</p>
+<div class="code-wrapper"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">SQLite</span><span class="hljs-params">(master)</span></span> ✗: tree -h
+<span class="hljs-selector-attr">[4.0K]</span>  .
+├── <span class="hljs-selector-attr">[862K]</span>  shell<span class="hljs-selector-class">.c</span>
+├── <span class="hljs-selector-attr">[8.4M]</span>  SQLite3<span class="hljs-selector-class">.c</span>
+├── <span class="hljs-selector-attr">[ 37K]</span>  SQLite3ext<span class="hljs-selector-class">.h</span>
+└── <span class="hljs-selector-attr">[614K]</span>  SQLite3.h</code></pre></div>
+
+<p>然后我们参考 demo 的项目结构，将它添加到编译系统中:</p>
+<div class="code-wrapper"><pre><code class="hljs makefile">├── Kconfig
+├── Make.defs
+├── Makefile
+├── SQLite
+├── SQLite_cfg.h
+
+cat Makefile
+
+CSRCS += SQLite/SQLite3.c
+CFLAGS += -I$&#123;LIBRARIESDIR&#125;/SQLite
+CFLAGS += -D_HAVE_SQLite_CONFIG_H
+
+<span class="hljs-keyword">ifeq</span> (<span class="hljs-variable">$(CONFIG_TOOLS_SQLite)</span>, y)
+PROGNAME  = SQLite3
+PRIORITY  = 100
+STACKSIZE = $&#123;CONFIG_TOOLS_SQLite_STACKSIZE&#125;
+MAINSRC = SQLite/shell.c
+<span class="hljs-keyword">endif</span></code></pre></div>
+
+<p>SQLite 提供了一个命令行文件和一个库文件，我们将这两个分别添加到编译系统中，然后即可编译。<br>SQLite_cfg.h 是 SQLite 的配置文件，可以对他进行修改以进行裁剪，选择所需要的功能， 它的可选配置可以参考<a target="_blank" rel="noopener" href="https://www.sqlite.org/compile.html">Compile-time Options</a>.</p>
+<h2 id="运行-SQLite"><a href="#运行-SQLite" class="headerlink" title="运行 SQLite"></a>运行 SQLite</h2><p>同样的我们先在 sim 中运行， 先基于 board&#x2F;sim&#x2F;configs&#x2F;hello 的配置开启下面两个配置，然后编译运行。</p>
+<div class="code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">CONFIG_LIB_SQLITE</span>=y
+<span class="hljs-attr">CONFIG_TOOLS_SQLITE</span>=y</code></pre></div>
+
+<p>然后我们就可以在 NuttX 中和 Linux 一样的运行 SQLite 命令行工具了。<br>启动之后和之前一样会进入 NSH Shell，然后我们输入 sqlite3 就可以进入 SQLite 的命令行工具了。</p>
+<div class="code-wrapper"><pre><code class="hljs apache"><span class="hljs-attribute">NuttShell</span> (NSH)
+<span class="hljs-attribute">nsh</span>&gt;
+<span class="hljs-attribute">nsh</span>&gt; uname -a
+<span class="hljs-attribute">NuttX</span> <span class="hljs-number">0</span>.<span class="hljs-number">0</span>.<span class="hljs-number">0</span> <span class="hljs-number">6</span>cdde97822 Oct  <span class="hljs-number">5</span> <span class="hljs-number">2023</span> <span class="hljs-number">17</span>:<span class="hljs-number">11</span>:<span class="hljs-number">53</span> xtensa ESP32-devkitc
+<span class="hljs-attribute">nsh</span>&gt;
+<span class="hljs-attribute">nsh</span>&gt; cd data
+<span class="hljs-attribute">nsh</span>&gt; help
+<span class="hljs-attribute">Builtin</span> Apps:
+    <span class="hljs-attribute">demo</span>        hello       ping        sh          telnetd
+    <span class="hljs-attribute">dumpstack</span>   nsh         setlogmask  sqlite3
+<span class="hljs-attribute">nsh</span>&gt;
+</code></pre></div>
+<p>我们先进入 &#x2F;data 目录，以便后面的操作可以持久化到文件系统中。<br>在 sqlite3 的命令行中输入 .help 可以查看所有支持的命令。</p>
+<p>使用 .open 命令打开一个数据库文件，如果文件不存在则会创建一个新的数据库文件, 然后退出 sqlite3 命令行工具，在 &#x2F;data 目录下会出现一个 test.db 的文件</p>
+<div class="code-wrapper"><pre><code class="hljs stata">nsh&gt; sqlite3
+SQLite <span class="hljs-keyword">version</span> 3.43.1 2023-09-11 12:01:27
+Enter <span class="hljs-string">&quot;.help&quot;</span> <span class="hljs-keyword">for</span> usage hints.
+Connected to a transient <span class="hljs-keyword">in</span>-<span class="hljs-keyword">memory</span> database.
+<span class="hljs-keyword">Use</span> <span class="hljs-string">&quot;.open FILENAME&quot;</span> to reopen <span class="hljs-keyword">on</span> a persistent database.
+sqlite&gt; .<span class="hljs-keyword">open</span> <span class="hljs-keyword">test</span>.<span class="hljs-keyword">db</span>
+sqlite&gt;.quit
+nsh&gt; <span class="hljs-keyword">ls</span>
+/data:
+ .
+ ..
+ <span class="hljs-keyword">test</span>.<span class="hljs-keyword">db</span></code></pre></div>
+
+<p>我们再次进入 sqlite3 命令行工具，并创建一个表，使用 .tables 命令查看所有的表，可以看到我们刚才创建的 COMPANY 表。</p>
+<div class="code-wrapper"><pre><code class="hljs sql">sqlite<span class="hljs-operator">&gt;</span>  <span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> COMPANY(
+(x1...<span class="hljs-operator">&gt;</span>    ID <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY</span> KEY     <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+(x1...<span class="hljs-operator">&gt;</span>    NAME           TEXT    <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+(x1...<span class="hljs-operator">&gt;</span>    AGE            <span class="hljs-type">INT</span>     <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">NULL</span>,
+(x1...<span class="hljs-operator">&gt;</span>    ADDRESS        <span class="hljs-type">CHAR</span>(<span class="hljs-number">50</span>),
+(x1...<span class="hljs-operator">&gt;</span>    SALARY         <span class="hljs-type">REAL</span>
+(x1...<span class="hljs-operator">&gt;</span> );
+sqlite<span class="hljs-operator">&gt;</span>
+sqlite<span class="hljs-operator">&gt;</span> .tables
+COMPANY
+sqlite<span class="hljs-operator">&gt;</span></code></pre></div>
+
+<p>接着我们可以插入一些数据，然后使用 SELECT 命令查看数据。</p>
+<div class="code-wrapper"><pre><code class="hljs sql">sqlite<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+   ...<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">1</span>, <span class="hljs-string">&#x27;Paul&#x27;</span>, <span class="hljs-number">32</span>, <span class="hljs-string">&#x27;California&#x27;</span>, <span class="hljs-number">20000.00</span> );
+sqlite<span class="hljs-operator">&gt;</span>
+<span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> COMPANY (ID,NAME,AGE,ADDRESS,SALARY)
+<span class="hljs-keyword">VALUES</span> (<span class="hljs-number">2</span>, <span class="hljs-string">&#x27;Alsqlite&gt;    ...&gt; len&#x27;</span>, <span class="hljs-number">25</span>, <span class="hljs-string">&#x27;Texas&#x27;</span>, <span class="hljs-number">15000.00</span> );
+sqlite<span class="hljs-operator">&gt;</span>
+sqlite<span class="hljs-operator">&gt;</span>
+sqlite<span class="hljs-operator">&gt;</span> .header <span class="hljs-keyword">on</span>
+sqlite<span class="hljs-operator">&gt;</span> .mode <span class="hljs-keyword">column</span>
+sqlite<span class="hljs-operator">&gt;</span> <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> COMPANY;
+ID  NAME   AGE  ADDRESS     SALARY
+<span class="hljs-comment">--  -----  ---  ----------  -------</span>
+<span class="hljs-number">1</span>   Paul   <span class="hljs-number">32</span>   California  <span class="hljs-number">20000.0</span>
+<span class="hljs-number">2</span>   Allen  <span class="hljs-number">25</span>   Texas       <span class="hljs-number">15000.0</span></code></pre></div>
+<p>以上 sqlite3 的命令行工具的使用和 Linux 上的使用完全一致，甚至你可以将 linux 的 .db 文件拷贝到 NuttX 中使用。</p>
+<h1 id="ESP32-运行-SQLite"><a href="#ESP32-运行-SQLite" class="headerlink" title="ESP32 运行 SQLite"></a>ESP32 运行 SQLite</h1><h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><div class="code-wrapper"><pre><code class="hljs bash">pip install esptool
+
+<span class="hljs-built_in">mkdir</span> -p ~/.toolchain;<span class="hljs-built_in">cd</span> ~/.toolchain
+wget https://github.com/espressif/crosstool-NG/releases/download/esp-12.2.0_20230208/xtensa-esp32-elf-12.2.0_20230208-x86_64-Linux-gnu.tar.xz
+tar -xf ./xtensa-esp32-elf-12.2.0_20230208-x86_64-Linux-gnu.tar.xz
+<span class="hljs-built_in">rm</span> xtensa-esp32-elf-12.2.0_20230208-x86_64-Linux-gnu.tar.xz
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;export PATH=\&quot;\$HOME/.toolchain/xtensa-esp32-elf/bin:\$PATH\&quot;&quot;</span> &gt;&gt; ~/.profile
+<span class="hljs-built_in">source</span> ~/.profile</code></pre></div>
+
+<p>这里我使用的 ESP32 开发版是  ESP-WROOM-32,它有 4MB (32Mb) 的 SPI Flash和520KB SRAM。</p>
+<p><img src="https://files.mdnice.com/user/11205/0eefd057-189c-4878-be7a-b583b9c7ce7b.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="编译下载"><a href="#编译下载" class="headerlink" title="编译下载"></a>编译下载</h2><p>在这个配置中将将 1M 的 FALSH 作为了 代码空间，1M 的 FLASH 作为文件系统(Littlefs)。挂载到 &#x2F;data 目录</p>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># 编译 SQLite 配置</span>
+./nx.sh boards/esp32/configs/sqlite</code></pre></div>
+<p>使用上面的编译命令编译后会在 NuttX 目录下生成一个 NuttX.bin 文件， 然后我们需要将它烧录到设备中. 下面的的 &#x2F;dev&#x2F;ttyUSB0 需要根据实际情况填写。</p>
+<div class="code-wrapper"><pre><code class="hljs bash"><span class="hljs-comment"># ubuntu，下载固件到设备</span>
+esptool.py -c esp32 -p /dev/ttyUSB0 -b 921600  write_flash -fs detect -fm dio -ff 40m 0x1000 boards/esp32/boot/bootloader-esp32.bin 0x8000 boards/esp32/boot/partition-table-esp32.bin 0x10000 nuttx/nuttx.bin</code></pre></div>
+<p>烧录后打开串口终端，和上面执行相同的步骤可以体验在 ESP32 上使用 SQLite 的命令行工具.(上面实际就是 ESP32 上运行的结果)</p>
+<h2 id="在代码中使用"><a href="#在代码中使用" class="headerlink" title="在代码中使用"></a>在代码中使用</h2><p>在 NuttX 中使用 SQLite 也和 Linux 一样，只需要在代码中包含 sqlite3.h 头文件即可。<br>例如我们在 demo 项目中添加一个 sqlite3 的 demo，代码如下:</p>
+<div class="code-wrapper"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sqlite3.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span>
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">callback</span><span class="hljs-params">(<span class="hljs-type">void</span> *NotUsed, <span class="hljs-type">int</span> argc, <span class="hljs-type">char</span> **argv,</span></span>
+<span class="hljs-params"><span class="hljs-function">                    <span class="hljs-type">char</span> **azColName)</span> </span>&#123;
+    NotUsed = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; argc; i++) &#123;
+        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s = %s\n&quot;</span>, azColName[i], argv[i] ? argv[i] : <span class="hljs-string">&quot;NULL&quot;</span>);
+    &#125;
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;
+
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> </span>&#123;
+    sqlite3 *db;
+    <span class="hljs-type">char</span> *err_msg = <span class="hljs-number">0</span>;
+    <span class="hljs-type">int</span> rc = <span class="hljs-built_in">sqlite3_open</span>(<span class="hljs-string">&quot;test.db&quot;</span>, &amp;db);
+    <span class="hljs-keyword">if</span> (rc != SQLITE_OK) &#123;
+        <span class="hljs-built_in">fprintf</span>(stderr, <span class="hljs-string">&quot;Cannot open database: %s\n&quot;</span>,
+                <span class="hljs-built_in">sqlite3_errmsg</span>(db));
+        <span class="hljs-built_in">sqlite3_close</span>(db);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+    &#125;
+    <span class="hljs-type">char</span> *sql = <span class="hljs-string">&quot;SELECT * FROM Cars&quot;</span>;
+    rc = <span class="hljs-built_in">sqlite3_exec</span>(db, sql, callback, <span class="hljs-number">0</span>, &amp;err_msg);
+    <span class="hljs-keyword">if</span> (rc != SQLITE_OK ) &#123;
+        <span class="hljs-built_in">fprintf</span>(stderr, <span class="hljs-string">&quot;Failed to select data\n&quot;</span>);
+        <span class="hljs-built_in">fprintf</span>(stderr, <span class="hljs-string">&quot;SQL error: %s\n&quot;</span>, err_msg);
+        <span class="hljs-built_in">sqlite3_free</span>(err_msg);
+        <span class="hljs-built_in">sqlite3_close</span>(db);
+        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+    &#125;
+    <span class="hljs-built_in">sqlite3_close</span>(db);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+&#125;
+</code></pre></div>
+<p>在上面的代码中我们使用了一个 callback 函数，这个函数是在执行 SELECT 命令后的回调函数，它会将查询的结果打印出来。</p>
+<p>运行结果如下:</p>
+<div class="code-wrapper"><pre><code class="hljs abnf">nsh&gt; cd data
+nsh&gt; demo
+<span class="hljs-attribute">Id</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>
+<span class="hljs-attribute">Name</span> <span class="hljs-operator">=</span> Audi
+<span class="hljs-attribute">Price</span> <span class="hljs-operator">=</span> <span class="hljs-number">52642</span>
+
+<span class="hljs-attribute">Id</span> <span class="hljs-operator">=</span> <span class="hljs-number">2</span>
+<span class="hljs-attribute">Name</span> <span class="hljs-operator">=</span> Mercedes
+<span class="hljs-attribute">Price</span> <span class="hljs-operator">=</span> <span class="hljs-number">57127</span>
+
+<span class="hljs-attribute">Id</span> <span class="hljs-operator">=</span> <span class="hljs-number">3</span>
+<span class="hljs-attribute">Name</span> <span class="hljs-operator">=</span> Skoda
+<span class="hljs-attribute">Price</span> <span class="hljs-operator">=</span> <span class="hljs-number">9000</span>
+...</code></pre></div>
+
+<h2 id="资源占用"><a href="#资源占用" class="headerlink" title="资源占用"></a>资源占用</h2><p>在 ESP32 编译后比较开启 SQLite 前后的资源占用，SQLite 占用大概 600K 的 FLASH 和 70K 的 RAM<br>如果对 sqlite_cfg.h 进行配置后，可以进一步裁剪降低  FLASH 的占用。</p>
+<div class="code-wrapper"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">NXOS</span><span class="hljs-params">(master)</span></span> ✗: size hello<span class="hljs-selector-class">.elf</span>
+   text    data     bss     dec     hex filename
+ <span class="hljs-number">110672</span>     <span class="hljs-number">532</span>    <span class="hljs-number">9632</span>  <span class="hljs-number">120836</span>   <span class="hljs-number">1</span>d804 hello<span class="hljs-selector-class">.elf</span>
+<span class="hljs-function"><span class="hljs-title">NXOS</span><span class="hljs-params">(master)</span></span> ✗: size sqlite<span class="hljs-selector-class">.elf</span>
+   text    data     bss     dec     hex filename
+ <span class="hljs-number">671310</span>    <span class="hljs-number">7664</span>   <span class="hljs-number">10680</span>  <span class="hljs-number">689654</span>   a85f6 sqlite.elf</code></pre></div>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>前段时间有人在公众号的后台问我，有没有关于 NuttX 的视频，我在网上搜了一下关于 NuttX 使用视频实在少得可怜。</p>
+<p>而我在 21 年的立的 flag 中就有关于发布一个视频，这次国庆假期总算有机会可以拔了这个 flag 了。</p>
+<p>视频的话明天会发出，如果对于这个文章有任何问题可以点击阅读原文到 github 进行评论交流（公众号注册太迟，没有留言功能😢）</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/nuttx/" class="print-no-link">#nuttx</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nuttx 运行 sqlite</div>
+      <div>https://gary-hobson.github.io/2023/10/14/nuttx运行sqlite/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>非典型技术宅</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/04/C%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8%E8%A7%84%E7%BA%A6%E4%B9%8B%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%82%E9%A1%BA%E5%BA%8F/" title="C语言调用规约之函数入参顺序">
+                        <span class="hidden-mobile">C语言调用规约之函数入参顺序</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

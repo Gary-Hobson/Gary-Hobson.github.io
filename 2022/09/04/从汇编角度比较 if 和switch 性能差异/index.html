@@ -1,0 +1,819 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="非典型技术宅">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="从汇编角度比较 if 和switch 性能差异絮絮叨叨 : 这个五一就好好的当个技术宅吧，把之前欠的作业给补上，后面争取稳定周更一篇 if 和 switch 性能差异在写代码的时候肯定会用到不少if和switch语句，除了我们都知道的用法上的差异，性能上有什么差异。 这篇文章尝试从汇编的角度去解决下面的几个问题。  影响if和switch性能的差异点在哪，他们有何异同。 if和switch的差异临">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么建议少用if语句，不是运行效率">
+<meta property="og:url" content="https://gary-hobson.github.io/2022/09/04/%E4%BB%8E%E6%B1%87%E7%BC%96%E8%A7%92%E5%BA%A6%E6%AF%94%E8%BE%83%20if%20%E5%92%8Cswitch%20%E6%80%A7%E8%83%BD%E5%B7%AE%E5%BC%82/index.html">
+<meta property="og:site_name" content="阿宅的小站">
+<meta property="og:description" content="从汇编角度比较 if 和switch 性能差异絮絮叨叨 : 这个五一就好好的当个技术宅吧，把之前欠的作业给补上，后面争取稳定周更一篇 if 和 switch 性能差异在写代码的时候肯定会用到不少if和switch语句，除了我们都知道的用法上的差异，性能上有什么差异。 这篇文章尝试从汇编的角度去解决下面的几个问题。  影响if和switch性能的差异点在哪，他们有何异同。 if和switch的差异临">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://files.mdnice.com/user/11205/2fa4ee83-f1d1-4831-9cde-76fe4f6ea53a.png">
+<meta property="article:published_time" content="2022-09-04T19:19:27.000Z">
+<meta property="article:modified_time" content="2024-06-22T16:54:54.153Z">
+<meta property="article:author" content="非典型技术宅">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://files.mdnice.com/user/11205/2fa4ee83-f1d1-4831-9cde-76fe4f6ea53a.png">
+  
+  
+  
+  <title>为什么建议少用if语句，不是运行效率 - 阿宅的小站</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"gary-hobson.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":30,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>阿宅的小站</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="为什么建议少用if语句，不是运行效率"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        非典型技术宅
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-09-04 19:19" pubdate>
+          星期日, 九月 4日 2022
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">为什么建议少用if语句，不是运行效率</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="从汇编角度比较-if-和switch-性能差异"><a href="#从汇编角度比较-if-和switch-性能差异" class="headerlink" title="从汇编角度比较 if 和switch 性能差异"></a>从汇编角度比较 if 和switch 性能差异</h1><p><strong>絮絮叨叨</strong> : 这个五一就好好的当个技术宅吧，把之前欠的作业给补上，后面争取稳定周更一篇</p>
+<h2 id="if-和-switch-性能差异"><a href="#if-和-switch-性能差异" class="headerlink" title="if 和 switch 性能差异"></a>if 和 switch 性能差异</h2><p>在写代码的时候肯定会用到不少if和switch语句，除了我们都知道的用法上的差异，性能上有什么差异。</p>
+<p>这篇文章尝试从汇编的角度去解决下面的几个问题。</p>
+<ul>
+<li>影响if和switch性能的差异点在哪，他们有何异同。</li>
+<li>if和switch的差异临界点在那，什么时候if和swtich的性能是一样的？</li>
+<li>如何选择使用if和swtich。</li>
+</ul>
+<blockquote>
+<p>以下分析运行环境为 centos7 ， gcc8.3</p>
+</blockquote>
+<h2 id="if-和-switch-用法区别"><a href="#if-和-switch-用法区别" class="headerlink" title="if 和 switch 用法区别"></a>if 和 switch 用法区别</h2><p>if 和 switch 用法的区别导致了他们在运行时效率差异的根本原因。</p>
+<p>先看两段代码：<br>代码一（test_if.c）：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;constant.h&quot;</span></span>
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">test_if</span><span class="hljs-params">(<span class="hljs-type">int</span> num)</span>
+&#123;
+    <span class="hljs-type">int</span> result;
+    <span class="hljs-keyword">if</span> (num == VALUE1)
+    &#123;
+        result = num + <span class="hljs-number">5</span>;
+    &#125;
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (num == VALUE2)
+    &#123;
+        result = num + <span class="hljs-number">9</span>;
+    &#125;
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (num == VALUE3)
+    &#123;
+        result = num + <span class="hljs-number">12</span>;
+    &#125;
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (num == VALUE4)
+    &#123;
+        result = num + <span class="hljs-number">15</span>;
+    &#125;
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (num == VALUE5)
+    &#123;
+        result = num + <span class="hljs-number">31</span>;
+    &#125;
+
+    <span class="hljs-keyword">return</span> result;
+&#125;</code></pre></div>
+
+<p>代码二（test_switch.c）：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;constant.h&quot;</span></span>
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">test_switch</span><span class="hljs-params">(<span class="hljs-type">int</span> num)</span>
+&#123;
+    <span class="hljs-type">int</span> result = num;
+
+    <span class="hljs-keyword">switch</span> (num)
+    &#123;
+    <span class="hljs-keyword">case</span> VALUE1:
+        result = num + <span class="hljs-number">5</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> VALUE2:
+        result = num + <span class="hljs-number">9</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> VALUE3:
+        result = num + <span class="hljs-number">12</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> VALUE4:
+        result = num + <span class="hljs-number">15</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> VALUE5:
+        result = num + <span class="hljs-number">31</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">default</span>:
+        result = <span class="hljs-number">0</span>;
+    &#125;
+    <span class="hljs-keyword">return</span> result;
+&#125;</code></pre></div>
+
+
+<p>其中 <code>VALUE1</code>,<code>VALUE2</code>,<code>VALUE3</code>是在头文件<code>constant.h</code>定义的宏：</p>
+<div class="code-wrapper"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> CONSTANT_H_</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> CONSTANT_H_</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE1 101</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE2 103</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE3 105</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE4 107</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE5 111</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span></code></pre></div>
+<p>上面的两段测试代码,完成相同功能：将传入的参数加上一个值后返回。</p>
+<p>在if语句的测试代码中，使用if-else对所有条件进行逐一判断，满足条件后执行对应的代码。</p>
+<p>而在swtich的测试代码中，直接根据num的值，跳转到对应标签的代码段执行。</p>
+<p>if和switch都可以根据不同的输入，选择执行对应的代码，但是用用法上看，if语句需要对条件逐一判断，而switch语句，则不要判断直接可以跳转到对应的代码。</p>
+<p>在我的理解中，switch语句有点像一个哈希表，实现<strong>整形数字到一个地址空间的映射</strong>，在使用时整形数字作为键（key），然后跳转到对应代码的地址（value）去执行。</p>
+<p>然而在C语言中不存在map这种数据结构，在CPU的指令中也不存在这样的指令。</p>
+<h2 id="if-和-switch-汇编代码分析"><a href="#if-和-switch-汇编代码分析" class="headerlink" title="if 和 switch 汇编代码分析"></a>if 和 switch 汇编代码分析</h2><p>在switch语句中，实现了类似哈希表（hash table）的数据结构。<br>在C语言中并不直接支持哈希表，如果要使用则必须自行设计相关代码。</p>
+<p>通过汇编命令<code>gcc -S -O1 test_switch.c -o test_switch.s</code>查看gcc在编译时如何处理switch语句。</p>
+<p>上面两段程序对应的汇编代码如下：<br>test_if.s</p>
+<div class="code-wrapper"><pre><code class="hljs mel">test_if:
+.LFB0:
+	.cfi_startproc
+	movl	$106, %eax  ;设置返回值寄存器为<span class="hljs-number">106</span>
+	cmpl	$101, %edi  ;将参数和立即数<span class="hljs-number">101</span>比较，相等将ZF标志位置位
+	je	.L1        ;如果ZF置位，则跳转到L1
+	movl	$112, %eax
+	cmpl	$103, %edi
+	je	.L1
+	movl	$117, %eax
+	cmpl	$105, %edi
+	je	.L1
+	movl	$122, %eax
+	cmpl	$107, %edi
+	je	.L1
+	cmpl	$111, %edi
+	movl	$0, %eax
+	movl	$142, %edx
+	cmove	%edx, %eax
+.L1:              ;返回
+	ret</code></pre></div>
+
+<p>switch_test.s</p>
+<div class="code-wrapper"><pre><code class="hljs jboss-cli">test_switch:
+<span class="hljs-string">.LFB0</span>:
+	subl	$101, %edi   ;计算根据参数，计算索引值
+	cmpl	$10, %edi    ;索引大于10，则跳转（与下面语句配合使用）
+	ja	<span class="hljs-string">.L9</span>            ;如果CF=0 且 ZF=0，跳转到default代码段,
+	movl	%edi, %edi
+	jmp	*<span class="hljs-string">.L4</span><span class="hljs-params">(,%rdi,8)</span>  ;跳转到索引对应的地址标号
+	<span class="hljs-string">.section</span>	<span class="hljs-string">.rodata</span>
+	<span class="hljs-string">.align</span> 8
+	<span class="hljs-string">.align</span> 4
+<span class="hljs-string">.L4</span>:                 ;地址标号跳转表
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L8</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L7</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L6</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L5</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L9</span>
+	<span class="hljs-string">.quad</span>	<span class="hljs-string">.L3</span>
+	<span class="hljs-string">.text</span>
+<span class="hljs-string">.L8</span>:
+	movl	$106, %eax  ; 将结果放入返回值寄存器
+	ret               ; 返回
+<span class="hljs-string">.L7</span>:
+	movl	$112, %eax
+	ret
+<span class="hljs-string">.L6</span>:
+	movl	$117, %eax
+	ret
+<span class="hljs-string">.L5</span>:
+	movl	$122, %eax
+	ret
+<span class="hljs-string">.L3</span>:
+	movl	$142, %eax
+	ret
+<span class="hljs-string">.L9</span>:
+	movl	$0, %eax
+	ret</code></pre></div>
+<blockquote>
+<p>注：为了简单汇编代码长度，在编译汇编代码，开启了1级优化，不同等级优化的汇编结果不同。</p>
+</blockquote>
+<p>在test_if对应的汇编代码中，可以很明显的看到程序处理逻辑为：依次判断是否满足条件，满足条件则执行对应代码。</p>
+<p>在switch的汇编代码中，可以发现程序逻辑明显不同与if-else语句。</p>
+<p>在switch的汇编中，首先将所有case对应的代码开始地址，放到L4标号所对应的连续地址中。<br>它可以理解为生成了一个常量数组<code>const uint32_t L4[VALUE5-VALUE1]=&#123;...&#125;;</code>，其数组内容顺序是按照处理case处理后的索引排序。<br>例如<code>VALUE3</code>对应的值为103，首先生成索引103-100&#x3D;3，然后<code>L4[3]</code>对应的值就是case 103 所在的代码开始地址。</p>
+<p>在switch的汇编中，为了实现直接跳转功能，使用数组实现了一个哈希表，而对应的哈希函数由编译器自动生成，在上面代码中哈希函数为 <code>value = L4[key-100];</code><br>实际上这种应该叫跳转表（jump table），而不是哈希表（hash table）。</p>
+<h2 id="if-和switch性能差异比较"><a href="#if-和switch性能差异比较" class="headerlink" title="if 和switch性能差异比较"></a>if 和switch性能差异比较</h2><p>通过汇编代码的比较可以发现，使用 test_switch.o 的代码大小比 test_if.o 的代码大小要高出不少，test_if.o大小为105字节，而test_swtch.o大小为189字节。</p>
+<p><img src="https://files.mdnice.com/user/11205/2fa4ee83-f1d1-4831-9cde-76fe4f6ea53a.png" srcset="/img/loading.gif" lazyload></p>
+<p>这是鱼和熊掌不可兼得的一个体现，switch 语句减少了判断的时间，但是引进跳转表增加了代码空间，不过在大多数情况下这种代价是划算的。</p>
+<p>不过通过对上面的汇编代码分析，需要质疑的是switch语句的效率一直if语句高吗？</p>
+<p>在上面的汇编代码中知道，switch实际是使用跳转表实现的，如果各项case值差异很大呢，它还会生成跳转表吗？</p>
+<p>我们把之前头文件对应VALUE的值改动后，重新生成汇编代码查看：</p>
+<div class="code-wrapper"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE1 1</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE2 10</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE3 30</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE4 50</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> VALUE5 111</span></code></pre></div>
+<p>汇编代码：</p>
+<div class="code-wrapper"><pre><code class="hljs c">test_switch:
+.LFB0:
+	.cfi_startproc
+	cmpl	$<span class="hljs-number">30</span>, %edi
+	je	.L4
+	jle	.L9
+	movl	$<span class="hljs-number">65</span>, %eax
+	cmpl	$<span class="hljs-number">50</span>, %edi
+	je	.L1
+	cmpl	$<span class="hljs-number">111</span>, %edi
+	movl	$<span class="hljs-number">0</span>, %eax
+	movl	$<span class="hljs-number">142</span>, %edx
+	cmove	%edx, %eax
+	ret
+.L9:
+	movl	$<span class="hljs-number">6</span>, %eax
+	cmpl	$<span class="hljs-number">1</span>, %edi
+	je	.L1
+	cmpl	$<span class="hljs-number">10</span>, %edi
+	movl	$<span class="hljs-number">0</span>, %eax
+	movl	$<span class="hljs-number">19</span>, %edx
+	cmove	%edx, %eax
+	ret
+.L4:
+	movl	$<span class="hljs-number">42</span>, %eax
+.L1:
+	ret</code></pre></div>
+
+<p>可以发现在cese各项值之间差异很大，switch语句将退化为if结构，和if语句效率无明显差异。</p>
+<h2 id="if-和-switch-选择"><a href="#if-和-switch-选择" class="headerlink" title="if 和 switch 选择"></a>if 和 switch 选择</h2><ol>
+<li>在分支数量小于4时，两者无明显差异，都是使用 cmp-jmp 指令进行处理。</li>
+<li>在分支数量大于4，且case间跨度较小时，编译器使用跳转表可加快处理时间。</li>
+<li>在case值跨度比较大时，switch语句退化为cmp-jmp 指令，性能无明显差异。</li>
+<li>在分支数量比较多跨度比较大，且需要加快处理时间，可自行设计数据结构实现跳转表。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_31108501/article/details/51842166" title="gcc 优化选项"></a><br><a href="swtich%E8%AF%AD%E5%8F%A5" title="《深入理解计算机系统》"></a><br><a href="swtich%E8%AF%AD%E5%8F%A5" title="《C Primer Plus》"></a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>为什么建议少用if语句，不是运行效率</div>
+      <div>https://gary-hobson.github.io/2022/09/04/从汇编角度比较 if 和switch 性能差异/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>非典型技术宅</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年9月4日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/04/%E4%BA%8C%E5%80%BC%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%92%8C%E4%BA%92%E6%96%A5%E9%94%81%E6%9C%89%E4%BD%95%E5%BC%82%E5%90%8C/" title="二值信号量和互斥锁有何异同">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">二值信号量和互斥锁有何异同</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/04/%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%92%8C%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E6%9C%89%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB/" title="依赖注入和工厂模式有什么关系">
+                        <span class="hidden-mobile">依赖注入和工厂模式有什么关系</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
